@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -28,7 +29,8 @@ import { MatCardModule } from '@angular/material/card';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatCardModule
+    MatCardModule,
+    RouterLink
   ],
 
   templateUrl: './login.component.html',

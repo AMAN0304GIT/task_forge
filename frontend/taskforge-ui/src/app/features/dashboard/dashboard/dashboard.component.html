@@ -1,31 +1,127 @@
-<mat-toolbar color="primary">
+<div class="dashboard-layout">
+  <!-- SIDEBAR -->
 
-    <span>
-      TaskForge Dashboard
-    </span>
-  
-    <span class="spacer"></span>
-  
-    <button
-      mat-raised-button
-      color="warn"
-      (click)="logout()"
-    >
-  
-      Logout
-  
-    </button>
-  
-  </mat-toolbar>
-  
-  <div class="dashboard-container">
-  
-    <h1>
-      Welcome to TaskForge 🚀
-    </h1>
-  
-    <p>
-      Authentication system is working.
-    </p>
-  
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>TaskForge</h2>
+    </div>
+
+    <mat-nav-list>
+      <a mat-list-item class="nav-item active">
+        <mat-icon> dashboard </mat-icon>
+
+        <span> Dashboard </span>
+      </a>
+
+      <a mat-list-item class="nav-item">
+        <mat-icon> view_kanban </mat-icon>
+
+        <span> Boards </span>
+      </a>
+
+      <a mat-list-item class="nav-item">
+        <mat-icon> task </mat-icon>
+
+        <span> Tasks </span>
+      </a>
+
+      <a mat-list-item class="nav-item">
+        <mat-icon> settings </mat-icon>
+
+        <span> Settings </span>
+      </a>
+    </mat-nav-list>
+  </aside>
+
+  <!-- MAIN -->
+
+  <div class="main-content">
+    <!-- TOPBAR -->
+
+    <mat-toolbar class="topbar">
+      <div>
+        <h2 class="page-title">Dashboard</h2>
+      </div>
+
+      <span class="spacer"></span>
+
+      <button mat-button class="logout-btn" (click)="logout()">Logout</button>
+    </mat-toolbar>
+
+    <!-- CONTENT -->
+
+    <div class="content-wrapper">
+      <!-- HERO -->
+
+      <div class="hero-section">
+        <h1>Welcome back, Aman</h1>
+
+        <p>Here's what's happening in your workspace today.</p>
+      </div>
+
+      <!-- STATS -->
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <mat-icon> view_kanban </mat-icon>
+
+          <h3>12</h3>
+
+          <p>Total Boards</p>
+        </div>
+
+        <div class="stat-card">
+          <mat-icon> task_alt </mat-icon>
+
+          <h3>38</h3>
+
+          <p>Completed Tasks</p>
+        </div>
+
+        <div class="stat-card">
+          <mat-icon> pending_actions </mat-icon>
+
+          <h3>14</h3>
+
+          <p>Pending Tasks</p>
+        </div>
+
+        <div class="stat-card">
+          <mat-icon> schedule </mat-icon>
+
+          <h3>5</h3>
+
+          <p>Due Today</p>
+        </div>
+      </div>
+
+      <!-- RECENT SECTION -->
+
+      <div class="section-grid">
+        <div class="section-card">
+          <h3>Recent Boards</h3>
+
+          <ul>
+            <li>Development Sprint</li>
+
+            <li>Marketing Campaign</li>
+
+            <li>UI Redesign</li>
+          </ul>
+        </div>
+
+        <div class="section-card">
+          <h3>Upcoming Tasks</h3>
+
+          <ul>
+            <li>Implement drag-drop</li>
+
+            <li>Review websocket sync</li>
+
+            <li>Optimize task API</li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
+</div>

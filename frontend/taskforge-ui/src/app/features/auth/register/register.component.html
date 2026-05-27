@@ -1,15 +1,24 @@
-<div class="register-container">
+<div class="auth-container">
 
-    <mat-card>
+    <mat-card class="auth-card">
   
-      <h2>Create Account</h2>
+      <h1 class="title">
+        Create Account
+      </h1>
+  
+      <p class="subtitle">
+        Start managing your projects
+      </p>
   
       <form
         [formGroup]="registerForm"
         (ngSubmit)="onSubmit()"
       >
   
-        <mat-form-field appearance="outline">
+        <mat-form-field
+          appearance="outline"
+          class="full-width"
+        >
   
           <mat-label>Username</mat-label>
   
@@ -21,7 +30,10 @@
   
         </mat-form-field>
   
-        <mat-form-field appearance="outline">
+        <mat-form-field
+          appearance="outline"
+          class="full-width"
+        >
   
           <mat-label>Email</mat-label>
   
@@ -33,7 +45,10 @@
   
         </mat-form-field>
   
-        <mat-form-field appearance="outline">
+        <mat-form-field
+          appearance="outline"
+          class="full-width"
+        >
   
           <mat-label>Password</mat-label>
   
@@ -46,13 +61,13 @@
         </mat-form-field>
   
         <button
-          mat-raised-button
+          mat-flat-button
           color="primary"
+          class="full-width register-btn"
           type="submit"
-          [disabled]="loading"
         >
   
-          Register
+          Create Account
   
         </button>
   
@@ -71,6 +86,16 @@
         </p>
   
       </form>
+  
+      <div class="footer-text">
+  
+        Already have an account?
+  
+        <a routerLink="/login">
+          Login
+        </a>
+  
+      </div>
   
     </mat-card>
   
