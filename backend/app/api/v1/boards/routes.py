@@ -8,7 +8,7 @@ from fastapi.security import HTTPBearer
 
 from sqlalchemy.orm import Session
 
-from app.core.database import SessionLocal
+from app.core.database import get_db
 
 from app.models.board import Board
 
@@ -36,7 +36,8 @@ security = HTTPBearer()
 )
 def create_board(
     board: BoardCreate,
-    credentials = Depends(security)
+    credentials = Depends(security),
+    db: Session = Depends(get_db)
 ):
 
     payload = verify_access_token(
@@ -50,11 +51,16 @@ def create_board(
             detail="Invalid token"
         )
 
-    db: Session = SessionLocal()
-
     user = db.query(User).filter(
         User.email == payload.get("sub")
     ).first()
+
+    if not user:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
 
     new_board = Board(
         title=board.title,
@@ -75,7 +81,8 @@ def create_board(
     response_model=list[BoardResponse]
 )
 def get_boards(
-    credentials = Depends(security)
+    credentials = Depends(security),
+    db: Session = Depends(get_db)
 ):
 
     payload = verify_access_token(
@@ -89,11 +96,16 @@ def get_boards(
             detail="Invalid token"
         )
 
-    db: Session = SessionLocal()
-
     user = db.query(User).filter(
         User.email == payload.get("sub")
     ).first()
+
+    if not user:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
 
     boards = db.query(Board).filter(
         Board.owner_id == user.id
@@ -108,7 +120,8 @@ def get_boards(
 def update_board(
     board_id: int,
     board: BoardCreate,
-    credentials = Depends(security)
+    credentials = Depends(security),
+    db: Session = Depends(get_db)
 ):
 
     payload = verify_access_token(
@@ -122,11 +135,16 @@ def update_board(
             detail="Invalid token"
         )
 
-    db: Session = SessionLocal()
-
     user = db.query(User).filter(
         User.email == payload.get("sub")
     ).first()
+
+    if not user:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
 
     existing_board = db.query(Board).filter(
         Board.id == board_id,
@@ -156,7 +174,8 @@ def update_board(
 @router.delete("/{board_id}")
 def delete_board(
     board_id: int,
-    credentials = Depends(security)
+    credentials = Depends(security),
+    db: Session = Depends(get_db)
 ):
 
     payload = verify_access_token(
@@ -170,11 +189,16 @@ def delete_board(
             detail="Invalid token"
         )
 
-    db: Session = SessionLocal()
-
     user = db.query(User).filter(
         User.email == payload.get("sub")
     ).first()
+
+    if not user:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
 
     existing_board = db.query(Board).filter(
         Board.id == board_id,

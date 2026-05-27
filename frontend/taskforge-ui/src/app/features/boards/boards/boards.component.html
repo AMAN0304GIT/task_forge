@@ -5,63 +5,142 @@
     <div>
       <h1>Boards</h1>
 
-      <p>Manage your project boards</p>
+      <p>
+        {{ boards.length }} {{ boards.length === 1 ? 'board' : 'boards' }} in your workspace
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="goToDashboard()"
+      >
+        <mat-icon>arrow_back</mat-icon>
+
+        Dashboard
+      </button>
+
+      <button
+        mat-button
+        type="button"
+        (click)="loadBoards()"
+        [disabled]="loadingBoards"
+      >
+        <mat-icon>refresh</mat-icon>
+
+        Refresh
+      </button>
     </div>
   </div>
 
-  <!-- CREATE BOARD -->
-
   <mat-card class="create-board-card">
-    <h3>Create Board</h3>
+    <h3>{{ editingBoardId ? 'Edit Board' : 'Create Board' }}</h3>
 
-    <form [formGroup]="boardForm">
+    <form [formGroup]="boardForm" (ngSubmit)="submitBoard()">
       <mat-form-field appearance="outline">
-        <mat-label> Board Title </mat-label>
+        <mat-label>Board Title</mat-label>
 
-        <input matInput formControlName="title" />
+        <input matInput formControlName="title" maxlength="80" autocomplete="off" />
+
+        <mat-error *ngIf="boardForm.get('title')?.hasError('required') || boardForm.get('title')?.hasError('pattern')">
+          Board title is required
+        </mat-error>
+
+        <mat-error *ngIf="boardForm.get('title')?.hasError('maxlength')">
+          Board title must be 80 characters or fewer
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label> Description </mat-label>
+        <mat-label>Description</mat-label>
 
-        <input matInput formControlName="description" />
+        <textarea matInput formControlName="description" maxlength="300" rows="2"></textarea>
+
+        <mat-hint align="end">
+          {{ boardForm.get('description')?.value?.length || 0 }}/300
+        </mat-hint>
+
+        <mat-error *ngIf="boardForm.get('description')?.hasError('maxlength')">
+          Description must be 300 characters or fewer
+        </mat-error>
       </mat-form-field>
 
-      <button mat-flat-button color="primary" (click)="submitBoard()">{{ editingBoardId ? 'Update Board' : 'Create Board' }}</button>
+      <div class="form-actions">
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="loading"
+        >
+          <mat-icon>{{ editingBoardId ? 'save' : 'add' }}</mat-icon>
+
+          {{ editingBoardId ? 'Update Board' : 'Create Board' }}
+        </button>
+
+        <button
+          *ngIf="editingBoardId"
+          mat-button
+          type="button"
+          (click)="cancelEdit()"
+          [disabled]="loading"
+        >
+          Cancel
+        </button>
+      </div>
     </form>
+
+    <p *ngIf="errorMessage" class="form-error">
+      {{ errorMessage }}
+    </p>
   </mat-card>
 
-  <!-- BOARD GRID -->
+  <div *ngIf="loadingBoards" class="empty-state">
+    <mat-icon>hourglass_top</mat-icon>
 
-  <div class="boards-grid">
+    <h2>Loading boards</h2>
+  </div>
+
+  <div *ngIf="!loadingBoards && !errorMessage && !boards.length" class="empty-state">
+    <mat-icon>view_kanban</mat-icon>
+
+    <h2>No boards yet</h2>
+
+    <p>Create your first board to start organizing work.</p>
+  </div>
+
+  <div *ngIf="!loadingBoards && boards.length" class="boards-grid">
     <mat-card class="board-card" *ngFor="let board of boards">
       <h2>
         {{ board.title }}
       </h2>
 
       <p>
-        {{ board.description }}
+        {{ board.description || 'No description added' }}
       </p>
       <div class="board-actions">
 
         <button
           mat-button
           color="primary"
-          (click)="editBoard(board)"
+          type="button"
+          (click)="editBoard(board, $event)"
         >
-      
+          <mat-icon>edit</mat-icon>
+
           Edit
-      
         </button>
       
         <button
           mat-button
           color="warn"
-          (click)="deleteBoard(board.id)"
+          type="button"
+          [disabled]="deletingBoardIds.has(board.id)"
+          (click)="deleteBoard(board, $event)"
         >
-      
-          Delete
-      
+          <mat-icon>delete</mat-icon>
+
+          {{ deletingBoardIds.has(board.id) ? 'Deleting...' : 'Delete' }}
         </button>
       
       </div>

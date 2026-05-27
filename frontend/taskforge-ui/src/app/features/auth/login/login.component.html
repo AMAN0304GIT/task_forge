@@ -9,16 +9,38 @@
         <mat-label>Email</mat-label>
 
         <input matInput type="email" formControlName="email" />
+
+        <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+          Email is required
+        </mat-error>
+
+        <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+          Enter a valid email address
+        </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Password</mat-label>
 
         <input matInput type="password" formControlName="password" />
+
+        <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+          Password is required
+        </mat-error>
+
+        <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
+          Password must be at least 6 characters
+        </mat-error>
       </mat-form-field>
 
-      <button mat-flat-button color="primary" class="full-width login-btn" type="submit">
-        Login
+      <button
+        mat-flat-button
+        color="primary"
+        class="full-width login-btn"
+        type="submit"
+        [disabled]="loading"
+      >
+        {{ loading ? 'Logging in...' : 'Login' }}
       </button>
 
       <p *ngIf="errorMessage" class="error">

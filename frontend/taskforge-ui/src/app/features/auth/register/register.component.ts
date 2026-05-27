@@ -68,7 +68,10 @@ export class RegisterComponent {
       username: [
         '',
         [
-          Validators.required
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(40),
+          Validators.pattern(/\S/)
         ]
       ],
 
@@ -84,13 +87,20 @@ export class RegisterComponent {
         '',
         [
           Validators.required,
-          Validators.minLength(6)
+          Validators.minLength(6),
+          Validators.maxLength(128)
         ]
       ]
     });
   }
 
   onSubmit() {
+
+    this.successMessage = '';
+
+    this.errorMessage = '';
+
+    this.registerForm.markAllAsTouched();
 
     if (this.registerForm.invalid) {
       return;
@@ -99,7 +109,11 @@ export class RegisterComponent {
     this.loading = true;
 
     this.authService.register(
-      this.registerForm.value
+      {
+        username: this.registerForm.value.username?.trim(),
+        email: this.registerForm.value.email?.trim(),
+        password: this.registerForm.value.password
+      }
     ).subscribe({
 
       next: () => {
@@ -118,10 +132,10 @@ export class RegisterComponent {
         }, 1500);
       },
 
-      error: () => {
+      error: (error) => {
 
         this.errorMessage =
-          'Registration failed';
+          error?.error?.detail || 'Registration failed';
 
         this.loading = false;
       }

@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 export class BoardService {
 
   private apiUrl =
-    'http://127.0.0.1:8000/boards';
+    'http://127.0.0.1:8000/boards/';
 
   constructor(
     private http: HttpClient
@@ -28,7 +28,7 @@ export class BoardService {
   ): Observable<any> {
 
     return this.http.post(
-      this.apiUrl + '/',
+      this.apiUrl,
       boardData
     );
   }
@@ -39,7 +39,7 @@ export class BoardService {
   ): Observable<any> {
   
     return this.http.put(
-      `${this.apiUrl}/${boardId}`,
+      `${this.apiUrl}${boardId}`,
       boardData
     );
   }
@@ -49,7 +49,7 @@ export class BoardService {
   ): Observable<any> {
   
     return this.http.delete(
-      `${this.apiUrl}/${boardId}`
+      `${this.apiUrl}${boardId}`
     );
   }
 }

@@ -1,9 +1,15 @@
 .boards-page {
   padding: 32px;
+  max-width: 1180px;
+  margin: 0 auto;
 }
 
 .boards-header {
   margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .boards-header h1 {
@@ -16,6 +22,17 @@
   color: #6b7280;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.header-actions mat-icon {
+  margin-right: 6px;
+}
+
 /* CREATE BOARD */
 
 .create-board-card {
@@ -23,21 +40,69 @@
 
   margin-bottom: 32px;
 
-  border-radius: 14px;
+  border-radius: 8px;
 }
 
 form {
-  display: flex;
+  display: grid;
 
   gap: 16px;
 
-  align-items: center;
+  align-items: start;
 
-  flex-wrap: wrap;
+  grid-template-columns: minmax(220px, 1fr) minmax(260px, 2fr) auto;
 }
 
 mat-form-field {
-  width: 250px;
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  min-height: 56px;
+  align-items: center;
+}
+
+.form-actions button {
+  min-height: 40px;
+}
+
+.form-actions mat-icon,
+.board-actions mat-icon {
+  margin-right: 6px;
+}
+
+.form-error {
+  color: #b00020;
+  margin: 8px 0 0;
+}
+
+.empty-state {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  min-height: 220px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #64748b;
+}
+
+.empty-state mat-icon {
+  color: #4f46e5;
+  font-size: 36px;
+  height: 36px;
+  width: 36px;
+  margin-bottom: 8px;
+}
+
+.empty-state h2 {
+  color: #111827;
+  margin: 0 0 8px;
+}
+
+.empty-state p {
+  margin: 0;
 }
 
 /* BOARD GRID */
@@ -53,9 +118,7 @@ mat-form-field {
 .board-card {
   padding: 24px;
 
-  border-radius: 14px;
-
-  cursor: pointer;
+  border-radius: 8px;
 
   transition: 0.2s ease;
 }
@@ -68,10 +131,12 @@ mat-form-field {
 
 .board-card h2 {
   margin-bottom: 12px;
+  overflow-wrap: anywhere;
 }
 
 .board-card p {
   color: #6b7280;
+  overflow-wrap: anywhere;
 }
 
 .board-actions {
@@ -84,3 +149,22 @@ mat-form-field {
   
     margin-top: 16px;
   }
+
+@media (max-width: 820px) {
+  .boards-page {
+    padding: 20px;
+  }
+
+  .boards-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    justify-content: flex-start;
+  }
+}

@@ -71,6 +71,10 @@ export class LoginComponent {
 
   onSubmit() {
 
+    this.errorMessage = '';
+
+    this.loginForm.markAllAsTouched();
+
     if (this.loginForm.invalid) {
       return;
     }
@@ -78,7 +82,10 @@ export class LoginComponent {
     this.loading = true;
 
     this.authService.login(
-      this.loginForm.value
+      {
+        email: this.loginForm.value.email?.trim(),
+        password: this.loginForm.value.password
+      }
     ).subscribe({
 
       next: (response) => {

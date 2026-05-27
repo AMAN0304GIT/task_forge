@@ -1,6 +1,8 @@
 import {
   Component,
-  OnInit
+  ChangeDetectorRef,
+  OnInit,
+  ViewChild
 } from '@angular/core';
 
 import {
@@ -10,7 +12,9 @@ import {
 import {
   ReactiveFormsModule,
   FormBuilder,
-  FormGroup
+  FormGroup,
+  FormGroupDirective,
+  Validators
 } from '@angular/forms';
 
 import {
@@ -33,6 +37,14 @@ import {
   MatFormFieldModule
 } from '@angular/material/form-field';
 
+import {
+  MatIconModule
+} from '@angular/material/icon';
+
+import {
+  Router
+} from '@angular/router';
+
 @Component({
   selector: 'app-boards',
 
@@ -44,7 +56,8 @@ import {
     MatCardModule,
     MatButtonModule,
     MatInputModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatIconModule
   ],
 
   templateUrl: './boards.component.html',
@@ -55,6 +68,9 @@ import {
 export class BoardsComponent
 implements OnInit {
 
+  @ViewChild(FormGroupDirective)
+  private formDirective?: FormGroupDirective;
+
   boards: any[] = [];
 
   boardForm: FormGroup;
@@ -62,16 +78,38 @@ implements OnInit {
   editingBoardId:
   number | null = null;
 
+  loading = false;
+
+  loadingBoards = false;
+
+  errorMessage = '';
+
+  deletingBoardIds = new Set<number>();
+
   constructor(
     private boardService: BoardService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
 
     this.boardForm = this.fb.group({
 
-      title: [''],
+      title: [
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(80),
+          Validators.pattern(/\S/)
+        ]
+      ],
 
-      description: ['']
+      description: [
+        '',
+        [
+          Validators.maxLength(300)
+        ]
+      ]
     });
   }
 
@@ -82,6 +120,10 @@ implements OnInit {
 
   loadBoards() {
 
+    this.errorMessage = '';
+
+    this.loadingBoards = true;
+
     this.boardService
       .getBoards()
       .subscribe({
@@ -89,16 +131,35 @@ implements OnInit {
         next: (response) => {
 
           this.boards = response;
+
+          this.loadingBoards = false;
+
+          this.syncView();
         },
 
         error: (error) => {
 
           console.log(error);
+
+          this.errorMessage =
+            'Unable to load boards. Please try again.';
+
+          this.loadingBoards = false;
+
+          this.syncView();
         }
       });
   }
 
   submitBoard() {
+
+    this.errorMessage = '';
+
+    this.boardForm.markAllAsTouched();
+
+    if (this.boardForm.invalid) {
+      return;
+    }
 
     if (
       this.editingBoardId !== null
@@ -109,9 +170,11 @@ implements OnInit {
       return;
     }
 
+    this.loading = true;
+
     this.boardService
       .createBoard(
-        this.boardForm.value
+        this.getBoardPayload()
       )
       .subscribe({
 
@@ -127,16 +190,34 @@ implements OnInit {
             title: '',
             description: ''
           });
+
+          this.resetBoardFormState();
+
+          this.loading = false;
+
+          this.syncView();
         },
 
         error: (error) => {
 
           console.log(error);
+
+          this.errorMessage =
+            'Unable to create board. Please check the details and try again.';
+
+          this.loading = false;
+
+          this.syncView();
         }
       });
   }
 
-  editBoard(board: any) {
+  editBoard(
+    board: any,
+    event?: MouseEvent
+  ) {
+
+    event?.stopPropagation();
 
     this.editingBoardId =
       board.id;
@@ -165,10 +246,18 @@ implements OnInit {
       return;
     }
 
+    this.boardForm.markAllAsTouched();
+
+    if (this.boardForm.invalid) {
+      return;
+    }
+
+    this.loading = true;
+
     this.boardService
       .updateBoard(
         this.editingBoardId,
-        this.boardForm.value
+        this.getBoardPayload()
       )
       .subscribe({
 
@@ -197,17 +286,69 @@ implements OnInit {
             description: ''
           });
 
+          this.resetBoardFormState();
+
           this.editingBoardId = null;
+
+          this.loading = false;
+
+          this.syncView();
         },
 
         error: (error) => {
 
           console.log(error);
+
+          this.errorMessage =
+            'Unable to update board. Please check the details and try again.';
+
+          this.loading = false;
+
+          this.syncView();
         }
       });
   }
 
-  deleteBoard(boardId: number) {
+  cancelEdit() {
+
+    this.editingBoardId = null;
+
+    this.errorMessage = '';
+
+    this.boardForm.reset({
+
+      title: '',
+      description: ''
+    });
+
+    this.resetBoardFormState();
+  }
+
+  goToDashboard() {
+
+    this.router.navigate(
+      ['/dashboard']
+    );
+  }
+
+  deleteBoard(
+    board: any,
+    event?: MouseEvent
+  ) {
+
+    event?.preventDefault();
+
+    event?.stopPropagation();
+
+    if (this.loading) {
+      return;
+    }
+
+    if (
+      this.deletingBoardIds.has(board.id)
+    ) {
+      return;
+    }
 
     const confirmed = confirm(
       'Delete this board?'
@@ -217,24 +358,96 @@ implements OnInit {
       return;
     }
 
+    const previousBoards = [
+      ...this.boards
+    ];
+
+    this.errorMessage = '';
+
+    this.deletingBoardIds.add(
+      board.id
+    );
+
+    this.boards =
+      this.boards.filter(
+
+        existingBoard =>
+          existingBoard.id !== board.id
+      );
+
+    this.syncView();
+
     this.boardService
-      .deleteBoard(boardId)
+      .deleteBoard(board.id)
       .subscribe({
 
         next: () => {
 
-          this.boards =
-            this.boards.filter(
+          this.deletingBoardIds.delete(
+            board.id
+          );
 
-              board =>
-                board.id !== boardId
-            );
+          this.syncView();
         },
 
         error: (error) => {
 
           console.log(error);
+
+          this.boards = previousBoards;
+
+          this.deletingBoardIds.delete(
+            board.id
+          );
+
+          this.errorMessage =
+            'Unable to delete board. Please try again.';
+
+          this.syncView();
         }
       });
+  }
+
+  private getBoardPayload() {
+
+    const title =
+      this.boardForm.value.title?.trim();
+
+    const description =
+      this.boardForm.value.description?.trim();
+
+    return {
+      title,
+      description: description || null
+    };
+  }
+
+  private resetBoardFormState() {
+
+    this.formDirective?.resetForm({
+
+      title: '',
+      description: ''
+    });
+
+    if (!this.formDirective) {
+
+      this.boardForm.reset({
+
+        title: '',
+        description: ''
+      });
+
+      this.boardForm.markAsPristine();
+
+      this.boardForm.markAsUntouched();
+
+      this.boardForm.updateValueAndValidity();
+    }
+  }
+
+  private syncView() {
+
+    this.cdr.detectChanges();
   }
 }

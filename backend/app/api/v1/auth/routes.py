@@ -16,7 +16,7 @@ from app.schemas.user_schema import (
 
 from app.models.user import User
 
-from app.core.database import SessionLocal
+from app.core.database import get_db
 
 from app.auth.hash import (
     hash_password,
@@ -37,10 +37,9 @@ security = HTTPBearer()
 
 @router.post("/register")
 def register_user(
-    user: UserRegister
+    user: UserRegister,
+    db: Session = Depends(get_db)
 ):
-
-    db: Session = SessionLocal()
 
     existing_user = db.query(
         User
@@ -81,10 +80,9 @@ def register_user(
     response_model=TokenResponse
 )
 def login_user(
-    user: UserLogin
+    user: UserLogin,
+    db: Session = Depends(get_db)
 ):
-
-    db: Session = SessionLocal()
 
     existing_user = db.query(
         User
