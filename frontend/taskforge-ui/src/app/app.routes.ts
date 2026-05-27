@@ -9,6 +9,9 @@ from './features/auth/register/register.component';
 import { DashboardComponent }
 from './features/dashboard/dashboard/dashboard.component';
 
+import { authGuard }
+from './core/guards/auth.guard';
+
 export const routes: Routes = [
 
   {
@@ -29,6 +32,7 @@ export const routes: Routes = [
 
   {
     path: 'dashboard',
-    component: DashboardComponent
+    component: DashboardComponent,
+    canActivate: [authGuard]
   }
 ];
