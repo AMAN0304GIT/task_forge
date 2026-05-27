@@ -36,4 +36,8 @@ export class DashboardComponent {
 
     this.router.navigate(['/login']);
   }
+
+  boards() {
+    this.router.navigate(['/boards']);
+  }
 }

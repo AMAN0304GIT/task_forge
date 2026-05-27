@@ -12,6 +12,9 @@ from './features/dashboard/dashboard/dashboard.component';
 import { authGuard }
 from './core/guards/auth.guard';
 
+import { BoardsComponent }
+from './features/boards/boards/boards.component';
+
 export const routes: Routes = [
 
   {
@@ -33,6 +36,12 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
+    canActivate: [authGuard]
+  },
+
+  {
+    path: 'boards',
+    component: BoardsComponent,
     canActivate: [authGuard]
   }
 ];

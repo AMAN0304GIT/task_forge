@@ -1,0 +1,72 @@
+<div class="boards-page">
+  <!-- HEADER -->
+
+  <div class="boards-header">
+    <div>
+      <h1>Boards</h1>
+
+      <p>Manage your project boards</p>
+    </div>
+  </div>
+
+  <!-- CREATE BOARD -->
+
+  <mat-card class="create-board-card">
+    <h3>Create Board</h3>
+
+    <form [formGroup]="boardForm">
+      <mat-form-field appearance="outline">
+        <mat-label> Board Title </mat-label>
+
+        <input matInput formControlName="title" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label> Description </mat-label>
+
+        <input matInput formControlName="description" />
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" (click)="submitBoard()">{{ editingBoardId ? 'Update Board' : 'Create Board' }}</button>
+    </form>
+  </mat-card>
+
+  <!-- BOARD GRID -->
+
+  <div class="boards-grid">
+    <mat-card class="board-card" *ngFor="let board of boards">
+      <h2>
+        {{ board.title }}
+      </h2>
+
+      <p>
+        {{ board.description }}
+      </p>
+      <div class="board-actions">
+
+        <button
+          mat-button
+          color="primary"
+          (click)="editBoard(board)"
+        >
+      
+          Edit
+      
+        </button>
+      
+        <button
+          mat-button
+          color="warn"
+          (click)="deleteBoard(board.id)"
+        >
+      
+          Delete
+      
+        </button>
+      
+      </div>
+
+    </mat-card>
+    
+  </div>
+</div>

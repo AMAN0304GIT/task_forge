@@ -100,3 +100,99 @@ def get_boards(
     ).all()
 
     return boards
+
+@router.put(
+    "/{board_id}",
+    response_model=BoardResponse
+)
+def update_board(
+    board_id: int,
+    board: BoardCreate,
+    credentials = Depends(security)
+):
+
+    payload = verify_access_token(
+        credentials.credentials
+    )
+
+    if not payload:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
+
+    db: Session = SessionLocal()
+
+    user = db.query(User).filter(
+        User.email == payload.get("sub")
+    ).first()
+
+    existing_board = db.query(Board).filter(
+        Board.id == board_id,
+        Board.owner_id == user.id
+    ).first()
+
+    if not existing_board:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Board not found"
+        )
+
+    existing_board.title = board.title
+
+    existing_board.description = (
+        board.description
+    )
+
+    db.commit()
+
+    db.refresh(existing_board)
+
+    return existing_board
+
+
+@router.delete("/{board_id}")
+def delete_board(
+    board_id: int,
+    credentials = Depends(security)
+):
+
+    payload = verify_access_token(
+        credentials.credentials
+    )
+
+    if not payload:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
+
+    db: Session = SessionLocal()
+
+    user = db.query(User).filter(
+        User.email == payload.get("sub")
+    ).first()
+
+    existing_board = db.query(Board).filter(
+        Board.id == board_id,
+        Board.owner_id == user.id
+    ).first()
+
+    if not existing_board:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Board not found"
+        )
+
+    db.delete(existing_board)
+
+    db.commit()
+
+    return {
+        "message":
+        "Board deleted successfully"
+    }
